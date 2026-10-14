@@ -1,0 +1,32 @@
+<template>
+    <lightning-card title="Introduction request" icon-name="standard:contact">
+        <div class="slds-var-p-around_medium">
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col slds-size_1-of-2">
+                    <c-contact-picker
+                        label="Requester"
+                        account-id={recordId}
+                        exclude-id={targetId}
+                        oncontactselect={handleRequesterSelect}>
+                    </c-contact-picker>
+                </div>
+                <div class="slds-col slds-size_1-of-2">
+                    <c-contact-picker
+                        label="Target"
+                        account-id={recordId}
+                        exclude-id={requesterId}
+                        oncontactselect={handleTargetSelect}>
+                    </c-contact-picker>
+                </div>
+            </div>
+
+            <lightning-button
+                class="slds-var-m-top_medium"
+                variant="brand"
+                label="Submit request"
+                disabled={isSubmitDisabled}
+                onclick={handleSubmit}>
+            </lightning-button>
+        </div>
+    </lightning-card>
+</template>

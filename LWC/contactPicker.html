@@ -1,0 +1,44 @@
+<template>
+    <div class="slds-form-element">
+        <label class="slds-form-element__label">{label}</label>
+        <div class="slds-form-element__control">
+
+            <template lwc:if={selectedContact}>
+                <lightning-pill label={selectedContact.Name} onremove={handleClear}>
+                    <lightning-icon slot="media" icon-name="standard:contact" alternative-text="Contact"></lightning-icon>
+                </lightning-pill>
+            </template>
+
+            <template lwc:else>
+                <lightning-input
+                    type="search"
+                    variant="label-hidden"
+                    label={label}
+                    placeholder="Search contacts"
+                    is-loading={isLoading}
+                    onchange={handleInput}>
+                </lightning-input>
+
+                <template lwc:if={error}>
+                    <p class="slds-text-color_error slds-var-m-top_x-small">{errorMessage}</p>
+                </template>
+                <template lwc:elseif={hasResults}>
+                    <ul class="slds-box slds-box_xx-small slds-var-m-top_xx-small">
+                        <template for:each={visibleContacts} for:item="contact">
+                            <li key={contact.Id}
+                                class="slds-var-p-around_x-small slds-text-link_reset"
+                                data-id={contact.Id}
+                                onclick={handleSelect}>
+                                {contact.Name}
+                            </li>
+                        </template>
+                    </ul>
+                </template>
+                <template lwc:elseif={showNoResults}>
+                    <p class="slds-text-color_weak slds-var-m-top_x-small">No contacts found</p>
+                </template>
+            </template>
+
+        </div>
+    </div>
+</template>

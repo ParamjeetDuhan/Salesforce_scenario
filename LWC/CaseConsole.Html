@@ -1,0 +1,43 @@
+<template>
+    <lightning-card title="Related Cases" icon-name="standard:case">
+        <div class="slds-var-m-around_medium">
+            
+            <!-- Dropdown Filter -->
+            <div class="slds-var-m-bottom_medium slds-size_1-of-4">
+                <lightning-combobox
+                    name="statusFilter"
+                    label="Filter by Status"
+                    value={selectedStatus}
+                    placeholder="Select Status"
+                    options={statusOptions}
+                    onchange={handleStatusChange}>
+                </lightning-combobox>
+            </div>
+
+            <!-- Display Table if data exists -->
+            <template if:true={caseData.length}>
+                <lightning-datatable
+                    key-field="Id"
+                    data={caseData}
+                    columns={columns}
+                    max-row-selection="1"
+                    onrowselection={handleRowSelection}>
+                </lightning-datatable>
+            </template>
+
+            <!-- Display message if no cases match the filter -->
+            <template if:false={caseData.length}>
+                <div class="slds-text-align_center slds-text-color_weak slds-var-p-around_medium">
+                    No cases found matching this status.
+                </div>
+            </template>
+
+            <!-- Error Handling -->
+            <template if:true={errors}>
+                <div class="slds-text-color_error">
+                    Error loading cases.
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>

@@ -1,0 +1,29 @@
+<template>
+    <lightning-card title="Update Selected Case" icon-name="standard:case_transcript">
+        <div class="slds-var-m-around_medium">
+            <template if:true={selectedCaseId}>
+                <lightning-record-edit-form 
+                    record-id={selectedCaseId} 
+                    object-api-name="Case"
+                    onsuccess={handleSuccess}>
+                    
+                    <lightning-messages></lightning-messages>
+                    
+                    <lightning-input-field field-name="Subject"></lightning-input-field>
+                    <lightning-input-field field-name="Status"></lightning-input-field>
+                    <lightning-input-field field-name="Priority"></lightning-input-field>
+                    
+                    <div class="slds-var-m-top_medium">
+                        <lightning-button type="submit" variant="brand" label="Save Changes"></lightning-button>
+                    </div>
+                </lightning-record-edit-form>
+            </template>
+
+            <template if:false={selectedCaseId}>
+                <p class="slds-text-align_center slds-text-color_weak">
+                    Select a case from the table to edit details.
+                </p>
+            </template>
+        </div>
+    </lightning-card>
+</template>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningMessageChannel xmlns="http://sforce.com">
+    <masterLabel>Case Channel</masterLabel>
+    <description>Message Channel to pass selected Case ID.</description>
+    <isExposed>true</isExposed>
+    <lightningMessageFields>
+        <fieldName>caseId</fieldName>
+        <description>The ID of the selected case record</description>
+    </lightningMessageFields>
+    <lightningMessageFields>
+    <fieldName>action</fieldName>
+    <description>SELECTED or UPDATED</description>
+</lightningMessageFields>
+</LightningMessageChannel>
