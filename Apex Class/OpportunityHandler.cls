@@ -1,4 +1,4 @@
-public class  OpportunityHandler{
+public with Sharing class  OpportunityHandler{
     
     public static void PreventSave(List<Opportunity> opp){
         if(!opp.isEmpty()){
@@ -59,5 +59,41 @@ public class  OpportunityHandler{
                 insert log;
             }
         }
+    }
+
+        @AuraEnabled(cacheable=true)
+    public static List<Opportunity> getOpenOpportunities(Id accountId, String stage) {
+        if (accountId == null) {
+            return new List<Opportunity>();
+        }
+        Boolean allStages = String.isBlank(stage) || stage == 'All';
+        return [
+            SELECT Id, Name, StageName, Amount, CloseDate
+            FROM Opportunity
+            WHERE AccountId = :accountId
+              AND IsClosed = false
+              AND (:allStages = true OR StageName = :stage)
+            WITH USER_MODE
+            ORDER BY CloseDate
+            LIMIT 200
+        ];
+    }
+
+    @AuraEnabled
+    public static void closeAsWon(Id opportunityId) {
+        try {
+            Opportunity opp = new Opportunity(Id = opportunityId, StageName = 'Closed Won');
+            update as user opp;
+        } catch (DmlException e) {
+            throw buildException(e.getDmlMessage(0));
+        } catch (Exception e) {
+            throw buildException(e.getMessage());
+        }
+    }
+
+    private static AuraHandledException buildException(String message) {
+        AuraHandledException ex = new AuraHandledException(message);
+        ex.setMessage(message);
+        return ex;
     }
 }
