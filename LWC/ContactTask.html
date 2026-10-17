@@ -1,0 +1,63 @@
+<template>
+    <lightning-card title="Open tasks" icon-name="standard:task">
+        <div class="slds-var-p-around_medium">
+
+            <div class="slds-grid slds-gutters slds-wrap">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                    <lightning-input
+                        type="search"
+                        label="Search subject"
+                        placeholder="Type 2 or more characters"
+                        onchange={handleSearchChange}>
+                    </lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                    <lightning-combobox
+                        label="Priority"
+                        value={selectedPriority}
+                        options={priorityOptions}
+                        onchange={handlePriorityChange}>
+                    </lightning-combobox>
+                </div>
+            </div>
+
+            <div class="slds-is-relative slds-var-m-top_medium">
+                <template lwc:if={isLoading}>
+                    <div style="min-height: 3rem">
+                        <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                    </div>
+                </template>
+                <template lwc:elseif={error}>
+                    <p class="slds-text-color_error">{errorMessage}</p>
+                </template>
+                <template lwc:elseif={tasks.length}>
+                    <p class="slds-var-m-bottom_small">Total tasks: {tasks.length}</p>
+                    <ul>
+                        <template for:each={tasks} for:item="task">
+                            <li key={task.Id}
+                                class="slds-grid slds-grid_vertical-align-center slds-var-p-vertical_x-small slds-border_bottom">
+                                <div class="slds-col slds-grow">
+                                    <p class="slds-text-heading_small">{task.Subject}</p>
+                                    <p class="slds-text-color_weak">
+                                        {task.Priority} | Due:
+                                        <lightning-formatted-date-time value={task.ActivityDate}></lightning-formatted-date-time>
+                                        | {task.Status}
+                                    </p>
+                                </div>
+                                <lightning-button
+                                    label="Mark complete"
+                                    data-id={task.Id}
+                                    onclick={handleMarkComplete}>
+                                </lightning-button>
+                            </li>
+                        </template>
+                    </ul>
+                </template>
+                <template lwc:else>
+                    <p class="slds-text-color_weak">No open tasks</p>
+                </template>
+            </div>
+
+        </div>
+    </lightning-card>
+</template>
