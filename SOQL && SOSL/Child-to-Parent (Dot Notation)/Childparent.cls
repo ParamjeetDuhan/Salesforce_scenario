@@ -6,3 +6,6 @@ SELECT Id, Name , Account.Owner.Name FROM Contact;
 SELECT Id, Name , Account__r.Name ,Account__r.Phone FROM Invoice__c
 WHERE Invoice__c.Status__c = 'Overdue';
 
+//Find all Case records showing Id, Subject, and the Contact.Account.Name (two levels up), where Status = 'Closed'.
+SELECT Id, Subject , Contact.Account.Name FROM Case
+WHERE Status = 'Closed';

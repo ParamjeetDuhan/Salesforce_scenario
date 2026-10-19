@@ -6,3 +6,7 @@ WHERE Account.Industry != 'Technology';
 SELECT Id, LastName
 FROM Contact
 WHERE Id NOT IN (SELECT ContactId FROM Case WHERE Status = 'Open' );
+
+//Find all Account records that have no Contacts at all (use an anti-join subquery).
+SELECT Id , Name , Rating FROM Account
+WHERE Id NOT IN(SELECT AccountId FROM Contact);

@@ -16,5 +16,10 @@ FROM Opportunity
 GROUP BY OwnerId
 HAVING AVG(Amount)>20000;
 
+//Find the number of Contacts per Account (AccountId), but only show Accounts having more than 2 Contacts, sorted by the count descending.
+SELECT Count(Id) Totalcontact , AccountId FROM Contact
+GROUP BY AccountId
+HAVING COUNT(Id)>2
+ORDER By COUNT(Id) DESC;
 
 
