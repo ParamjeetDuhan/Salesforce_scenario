@@ -8,3 +8,8 @@ FROM Account;
 SELECT Id, 
     (SELECT Product_Name__c, Quantity__c FROM Order_Items__r)
 FROM Order__c
+
+//Find all Account records along with their related Contacts (Id, LastName), but only include Contacts where Email != null.
+SELECT Id, Name , Rating , Industry,
+     (SELECT Id, LastName , Email FROM Contact WHERE Email != null)
+FROM Account;

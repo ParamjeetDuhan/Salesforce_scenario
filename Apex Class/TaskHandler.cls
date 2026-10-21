@@ -40,4 +40,55 @@ public with sharing class TaskHandler {
         ex.setMessage(message);
         return ex;
     }
-}
+
+    public static void CountOpenTask(List<Task> tasklist , Map<Id,Task> oldTaskList){
+         Set<Id> AccountId = new Set<Id>();
+         if(!tasklist.isEmpty()){
+              for(Task t: tasklist){
+                 if(t.WhatId != null && String.valueOf(t.WhatId).startsWith('001')){
+                     if(oldTaskList == null){
+                          AccountId.add(t.WhatId);
+                     }
+                     else if(t.Status != oldTaskList.get(t.Id).Status){
+                          AccountId.add(t.WhatId);
+                     }
+                 }
+              }
+         }
+         Map<Id,Integer> taskperAccount = new Map<Id,Integer>();
+
+         for(AggregateResult ar : [
+                                    SELECT WhatId , Count(Id) TotalCount FROM Task
+                                     WHERE WhatId IN : AccountId
+                                     AND Status != 'Completed'
+                                     GROUP BY WhatId
+         ]){
+            taskperAccount.put((Id)ar.get('WhatId'),(Integer)ar.get('TotalCount'));
+         }
+        List<Account> updatetaskCount = new List<Account>();
+          for(Id i : AccountId){
+                   Account a = new Account();
+                   a.Id = i;
+                   a.Open_Tasks__c = taskperAccount.containsKey(i) ? taskperAccount.get(i):0;
+                   updatetaskCount.add(a);
+          }
+          if(!updatetaskCount.isEmpty()){
+              update updatetaskCount;
+          }
+    }
+
+    public static void closingHighPriorityTaskRequireComment(List<Task> tasklist , Map<Id,Task> oldTaskList){
+            if(!tasklist.isEmpty()){
+                  for(Task t : tasklist){
+                         if(oldTaskList == null){
+                               if(t.Status == 'Completed' && t.Priority == 'High' && String.isBlank(t.Description)){
+                                    t.addError('High priority task with completed status must require Description');
+                               }
+                         }
+                         else if(t.Status == 'Completed' && oldTaskList.get(t.Id).Status != 'Completed' && t.Priority == 'High' && String.isBlank(t.Description)){
+                                    t.addError('High priority task with completed status must require Description');
+                         }
+                  }
+            }
+    }
+    }

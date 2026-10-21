@@ -6,3 +6,26 @@ Trigger LeadTrigger On Lead (Before insert){
             LeadHandler.preventDuplicateLead(Trigger.new);
         }
 }
+
+//Scenario: Lead Conversion Guard and Campaign Member Tracking
+
+trigger LeadTrigger on Lead (before insert, before update, after insert, after update) {
+
+    if (Trigger.isBefore) {
+        if (Trigger.isInsert) {
+            LeadHandler.validateUnqualifiedReason(Trigger.new, null);
+        }
+        if (Trigger.isUpdate) {
+            LeadHandler.validateUnqualifiedReason(Trigger.new, Trigger.oldMap);
+        }
+    }
+
+    if (Trigger.isAfter) {
+        if (Trigger.isInsert) {
+            LeadHandler.leadFollowUpTask(Trigger.new, null);
+        }
+        if (Trigger.isUpdate) {
+            LeadHandler.leadFollowUpTask(Trigger.new, Trigger.oldMap);
+        }
+    }
+}

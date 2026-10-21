@@ -25,3 +25,17 @@ Trigger ContactTrigger On Contact(before insert, before update,After insert,Afte
         }
     }
 }
+
+//Your org has a Contact object. When a Contact’s Email field changes, you must:
+
+//Immediately update a custom field Email_Verified__c = false on that Contact (this is a plain DML in the trigger context).
+//Call an external email-verification API with the new email address. The API returns {"valid": true} or {"valid": false}
+//Write the API result back to Email_Verified__c on the same Contact.
+
+trigger ContactEmailTrigger on Contact (before insert, before update, after insert, after update) {
+    if (Trigger.isBefore) {
+        ContactEmailHandler.markUnverified(Trigger.new, Trigger.oldMap);
+    } else if (Trigger.isAfter) {
+        ContactEmailHandler.enqueueVerification(Trigger.new, Trigger.oldMap);
+    }
+}
