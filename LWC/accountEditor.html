@@ -1,0 +1,64 @@
+<template>
+    <lightning-card title="Quick update" icon-name="standard:account">
+        <div class="slds-var-p-around_medium slds-is-relative">
+
+            <template lwc:if={isLoading}>
+                <div style="min-height: 3rem">
+                    <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                </div>
+            </template>
+
+            <template lwc:elseif={error}>
+                <p class="slds-text-color_error">{errorMessage}</p>
+            </template>
+
+            <template lwc:elseif={record}>
+
+                <template lwc:if={isEditMode}>
+                    <p class="slds-text-heading_small slds-var-m-bottom_small">{name}</p>
+                    <lightning-combobox
+                        label="Rating"
+                        value={draftRating}
+                        options={ratingOptions}
+                        onchange={handleRatingChange}>
+                    </lightning-combobox>
+                    <lightning-input
+                        data-id="phone"
+                        type="tel"
+                        label="Phone"
+                        value={draftPhone}
+                        onchange={handlePhoneChange}>
+                    </lightning-input>
+                    <div class="slds-var-m-top_medium">
+                        <lightning-button
+                            label="Cancel"
+                            onclick={handleCancel}
+                            disabled={isSaving}
+                            class="slds-var-m-right_x-small">
+                        </lightning-button>
+                        <lightning-button
+                            variant="brand"
+                            label="Save"
+                            onclick={handleSave}
+                            disabled={isSaving}>
+                        </lightning-button>
+                    </div>
+                </template>
+
+                <template lwc:else>
+                    <p class="slds-text-heading_small">{name}</p>
+                    <p class="slds-text-color_weak">{industry}</p>
+                    <div class="slds-var-m-top_small">
+                        <span class="slds-var-m-right_x-small">Rating:</span>
+                        <lightning-badge label={rating} class={ratingBadgeClass}></lightning-badge>
+                    </div>
+                    <p class="slds-var-m-top_x-small">Phone: {phone}</p>
+                    <div class="slds-var-m-top_medium">
+                        <lightning-button label="Edit" onclick={handleEdit}></lightning-button>
+                    </div>
+                </template>
+
+            </template>
+        </div>
+    </lightning-card>
+</template>
