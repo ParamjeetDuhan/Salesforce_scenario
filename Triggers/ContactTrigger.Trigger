@@ -39,3 +39,28 @@ trigger ContactEmailTrigger on Contact (before insert, before update, after inse
         ContactEmailHandler.enqueueVerification(Trigger.new, Trigger.oldMap);
     }
 }
+
+/* 1. Only one primary Contact per Account. When a Contact is inserted or updated with Is_Primary__c = true, 
+every other Contact under the same Account must have Is_Primary__c set to false. 
+If several Contacts in the same batch are marked primary for the same Account, 
+throw an error on the extra ones. */
+/*2. Sync the primary email to the Account. The Account’s Primary_Contact_Email__c must always show the Email of its primary Contact.
+ If the primary Contact is deleted or unmarked, the field should be cleared (set to null). */
+trigger PrimaryContactTrigger on Contact (before insert, before update, after insert, after update, after delete, after undelete) {
+    if (Trigger.isBefore) {
+        ContactEmailHandler.IsPrimary(Trigger.new);
+    }
+    else if (Trigger.isAfter) {
+        if (Trigger.isInsert || Trigger.isUndelete) {
+            ContactEmailHandler.UnmarkOtherPrimary(Trigger.new);
+            ContactEmailHandler.SyncPrimaryContactEmail(Trigger.new, null);
+        }
+        if (Trigger.isUpdate) {
+            ContactEmailHandler.UnmarkOtherPrimary(Trigger.new);
+            ContactEmailHandler.SyncPrimaryContactEmail(Trigger.new, Trigger.oldMap);
+        }
+        if (Trigger.isDelete) {
+            ContactEmailHandler.SyncPrimaryContactEmail(Trigger.old, null);
+        }
+    }
+}

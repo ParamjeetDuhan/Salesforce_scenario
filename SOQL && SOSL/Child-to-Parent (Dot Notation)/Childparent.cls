@@ -9,3 +9,8 @@ WHERE Invoice__c.Status__c = 'Overdue';
 //Find all Case records showing Id, Subject, and the Contact.Account.Name (two levels up), where Status = 'Closed'.
 SELECT Id, Subject , Contact.Account.Name FROM Case
 WHERE Status = 'Closed';
+
+/* Find all Contact records showing Name and the parent Account__r.Name from a custom lookup field Account__c on Contact.
+       Only include contacts whose Account__r.Industry = 'Healthcare'. */
+SELECT Id , LastName , Account__r.Name FROM Contact
+ WHERE Account__r.Industry = 'Healthcare';
