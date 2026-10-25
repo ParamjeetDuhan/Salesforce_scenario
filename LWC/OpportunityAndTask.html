@@ -1,0 +1,41 @@
+<template>
+    <lightning-card title="Opportunity quick actions" icon-name="standard:opportunity">
+        <lightning-button
+            slot="actions"
+            label="New Opportunity"
+            onclick={handleNewOpportunity}>
+        </lightning-button>
+
+        <div class="slds-var-p-around_medium">
+            <lightning-combobox
+                label="Filter by stage"
+                value={selectedStage}
+                options={stageOptions}
+                onchange={handleStageChange}>
+            </lightning-combobox>
+
+            <div class="slds-is-relative slds-var-m-top_medium">
+                <template lwc:if={isLoading}>
+                    <div style="min-height: 3rem">
+                        <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                    </div>
+                </template>
+                <template lwc:elseif={error}>
+                    <p class="slds-text-color_error">{errorMessage}</p>
+                </template>
+                <template lwc:elseif={opportunities.length}>
+                    <lightning-datatable
+                        key-field="Id"
+                        data={rows}
+                        columns={columns}
+                        hide-checkbox-column
+                        onrowaction={handleRowAction}>
+                    </lightning-datatable>
+                </template>
+                <template lwc:else>
+                    <p class="slds-text-color_weak">No open opportunities</p>
+                </template>
+            </div>
+        </div>
+    </lightning-card>
+</template>

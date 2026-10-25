@@ -1,0 +1,30 @@
+<template>
+    <lightning-card title="Edit contacts" icon-name="standard:contact">
+        <div class="slds-var-p-around_medium slds-is-relative">
+            <template lwc:if={isLoading}>
+                <div style="min-height: 3rem">
+                    <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                </div>
+            </template>
+            <template lwc:elseif={error}>
+                <p class="slds-text-color_error">{errorMessage}</p>
+            </template>
+            <template lwc:elseif={contacts.length}>
+                <lightning-datatable
+                    key-field="Id"
+                    data={contacts}
+                    columns={columns}
+                    draft-values={draftValues}
+                    errors={errors}
+                    is-loading={isSaving}
+                    hide-checkbox-column
+                    onsave={handleSave}
+                    oncancel={handleCancel}>
+                </lightning-datatable>
+            </template>
+            <template lwc:else>
+                <p class="slds-text-color_weak">No contacts on this account</p>
+            </template>
+        </div>
+    </lightning-card>
+</template>
