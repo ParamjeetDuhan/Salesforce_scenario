@@ -1,14 +1,14 @@
 // Trigger Scenario 
+//1. On the Opportunity object, prevent a record from being saved if the Amount field is greater than 100,000 and the StageName is "Closed Won"
+/*2. When an Opportunity's StageName changes to "Closed Won", automatically create a Task assigned to the Opportunity Owner reminding them 
+     to send a thank-you email to the customer. Also, if a Closed Won Opportunity's Amount is later edited to be lower than what it was,
+     add an entry to a custom Description field (or a related object like Opportunity_Change_Log__c) noting the amount reduction, with old 
+     and new values.*/
 trigger OpportunityTrigger On Opportunity(before insert,before update, After update){
 
-//On the Opportunity object, prevent a record from being saved if the Amount field is greater than 100,000 and the StageName is "Closed Won"
     if(Trigger.isBefore && (Trigger.isInsert || Trigger.isUpdate)){
         OpportunityHandler.PreventSave(Trigger.new);
     }
-//When an Opportunity's StageName changes to "Closed Won", automatically create a Task assigned to the Opportunity Owner reminding them 
-//to send a thank-you email to the customer. Also, if a Closed Won Opportunity's Amount is later edited to be lower than what it was,
-// add an entry to a custom Description field (or a related object like Opportunity_Change_Log__c) noting the amount reduction, with old 
-//and new values.
     if(Trigger.isAfter && Trigger.isUpdate){
         OpportunityHandler.afterUpdate(Trigger.new,Trigger.oldMap);
     }
@@ -30,4 +30,31 @@ trigger OpportunityLineItemTrigger on OpportunityLineItem(after insert,after del
            if(Trigger.isBefore && (Trigger.isInsert || Trigger.isUpdate)){
                       OpportunityLineItemHandler.blockDeepDiscounts(Trigger.new);
            }
+}
+/* 1. Copy the Account’s owner to a custom field on insert. When an Opportunity is created with an AccountId, 
+set the custom lookup field Account_Owner__c (lookup to User) on the Opportunity to the Owner of the parent Account. 
+If the Opportunity has no Account, leave it blank.*/
+/* 2. Track stage changes in a history record. Whenever an Opportunity’s StageName changes, 
+create a record in the custom object Stage_History__c with these fields: Opportunity__c (lookup), Old_Stage__c (text), 
+New_Stage__c (text), and Changed_On__c (Date, today). Also, an Opportunity cannot be moved from 'Closed Won' back to any other stage.
+ Block that with an error on the Opportunity.*/
+
+trigger OpportunityTrigger on Opportunity(before insert, before update , after insert , after update){
+    if(Trigger.isBefore){
+        if(Trigger.isInsert){
+                  OpportunityHandler.OwnerAssignment(Trigger.new,null);
+        }
+        if(Trigger.isUpdate){
+                  OpportunityHandler.OwnerAssignment(Trigger.new,Trigger.oldMap);
+                  OpportunityHandler.BlockStageMoved(Trigger.new,Trigger.oldMap);
+        }
+    }
+    if(Trigger.isAfter){
+        if(Trigger.isInsert){
+                  OpportunityHandler.TrackHistory(Trigger.new,null);
+        }
+        if(Trigger.isUpdate){
+                  OpportunityHandler.TrackHistory(Trigger.new,Trigger.oldMap);
+        }
+    }
 }

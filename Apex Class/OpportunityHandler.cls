@@ -96,4 +96,65 @@ public with Sharing class  OpportunityHandler{
         ex.setMessage(message);
         return ex;
     }
+
+   public static void OwnerAssignment(List<Opportunity> opplist,Map<Id,Opportunity> oldopplist){
+        Set<Id> accId = new Set<Id>();
+        List<Opportunity> oppsToAssign = new List<Opportunity>();
+        if(!opplist.isEmpty()){
+            for(Opportunity o : opplist){
+                if(oldopplist == null && o.AccountId != null){
+                    accId.add(o.AccountId);
+                    oppsToAssign.add(o);
+                }
+                else if(oldopplist != null && o.AccountId != null && oldopplist.get(o.Id).AccountId == null){
+                    accId.add(o.AccountId);
+                    oppsToAssign.add(o);
+                }
+            }
+        }
+        Map<Id,Id> AccountToOwner = new Map<Id,Id>();
+        for(Account a : [SELECT Id,OwnerId FROM Account
+                         WHERE Id IN : accId]){
+            AccountToOwner.put(a.Id,a.OwnerId);
+        }
+        for(Opportunity opp : oppsToAssign){
+            opp.Account_Owner__c = AccountToOwner.containsKey(opp.AccountId) ? AccountToOwner.get(opp.AccountId) : null;
+        }
+    }
+
+    public static void BlockStageMoved(List<Opportunity> opplist,Map<Id,Opportunity> oldopplist){
+        if(!opplist.isEmpty()){
+            for(Opportunity o : opplist){
+                if(oldopplist.get(o.Id).StageName == 'Closed Won' && o.StageName != 'Closed Won'){
+                    o.addError('Closed Won Opportunity stage cannot be changed');
+                }
+            }
+        }
+    }
+
+    public static void TrackHistory(List<Opportunity> opplist,Map<Id,Opportunity> oldopplist){
+        List<Stage_History__c> History = new List<Stage_History__c>();
+        if(!opplist.isEmpty()){
+            for(Opportunity o : opplist){
+                Stage_History__c h = new Stage_History__c();
+                if(oldopplist == null && !String.isBlank(o.StageName)){
+                    h.Opportunity__c = o.Id;
+                    h.Old_Stage__c = null;
+                    h.New_Stage__c  = o.StageName;
+                    h.Changed_On__c = Date.today();
+                    History.add(h);
+                }
+                else if(oldopplist != null && o.StageName != oldopplist.get(o.Id).StageName){
+                    h.Opportunity__c = o.Id;
+                    h.Old_Stage__c = oldopplist.get(o.Id).StageName;
+                    h.New_Stage__c  = o.StageName;
+                    h.Changed_On__c = Date.today();
+                    History.add(h);
+                }
+            }
+        }
+        if(!History.isEmpty()){
+            insert History;
+        }
+    }
 }
