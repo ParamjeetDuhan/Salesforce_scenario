@@ -17,3 +17,16 @@ WHERE CloseDate = NEXT_N_DAYS:15
 SELECT Id, Name FROM Account
 WHERE CreatedDate = LAST_N_DAYS:180
 AND Id IN (SELECT AccountId FROM Opportunity WHERE Amount > 100000)
+
+/*Find all Case records created in the last 7 days (use a date literal) showing Id, Subject, and 
+Contact.Account.Name, where Status != 'Closed'. */
+SELECT Id,Priority,Subject,Contact.Account.Name FROM Case
+WHERE CreatedDate = LAST_N_DAYS:7 AND IsClosed = false;
+
+/*Find all Contact records showing Id, LastName, and Account.Owner.Name, where the Account’s Industry = 'Finance' 
+and the Contact’s CreatedDate is in the last 3 months (use a date literal). Order by LastName ascending. */
+
+SELECT Id , LastName , Account.Owner.Name FROM Contact
+WHERE Account.Industry = 'Finance'
+AND CreatedDate = LAST_N_MONTHS:3
+ORDER BY LastName ASC;
